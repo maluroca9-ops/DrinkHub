@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drink Hub · Seu negócio, sob controle!</title>
+
+<!-- Importação das fontes do Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================================
+     ESTILOS GERAIS E VARIÁVEIS DE CORES
+  ========================================================== */
+  :root {
+    --fundo-principal: #0D0E12;  
+    --fundo-card: #16181E;       
+    --fundo-sidebar: #08090C;    
+    --cor-borda: #262933;       
+    
+    --amarelo-ouro: #E5A93C;    
+    --ouro-hover: #F5B94C;      
+    --brilho-ouro: rgba(229, 169, 60, 0.15);
+    
+    --texto-principal: #F0F2F5; 
+    --texto-suave: #8E95A5;     
+    --texto-escuro: #0D0E12;    
+    
+    --cor-erro: #E54D42;        
+    --cor-sucesso: #2EBF73;     
+    
+    --raio-borda: 8px;
+  }
+
+  *, *::before, *::after { 
+    box-sizing: border-box; 
+  }
+  
+  html, body { 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Work Sans', sans-serif; 
+    background: var(--fundo-principal); 
+    color: var(--texto-principal); 
+    min-height: 100vh; 
+  }
+  
+  h1, h2, h3, .fonte-marca {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ==========================================================
+     1. TELA DE LOGIN (CORRIGIDO)
+  ========================================================== */
+  #tela-login {
+    position: fixed;
+    inset: 0;
+    background: var(--fundo-principal);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #tela-login.escondido { display: none; }
+  
+  .card-login {
+    background: var(--fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 32px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    text-align: center;
+  }
+
+  #form-login {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Ícone das Garrafas */
+  .icone-logo {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: 16px;
+    height: 54px;
+  }
+  .garrafa {
+    background: var(--amarelo-ouro);
+    border-radius: 3px 3px 1px 1px;
+    position: relative;
+  }
+  .garrafa::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 6px;
+    background: var(--amarelo-ouro);
+    border-radius: 2px 2px 0 0;
+  }
+  .g-esquerda, .g-direita { width: 12px; height: 34px; }
+  .g-centro { width: 14px; height: 44px; }
+  
+  .titulo-marca {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FFF;
+    text-transform: uppercase;
+  }
+  .titulo-marca span { color: var(--amarelo-ouro); }
+  .slogan-marca {
+    font-size: 12px;
+    color: var(--texto-suave);
+    font-style: italic;
+    margin-top: 4px;
+    margin-bottom: 28px;
+  }
+
+  /* ==========================================================
+     2. ESTRUTURA E LAYOUT DO SISTEMA
+  ========================================================== */
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: static; width: 100%; height: auto; }
+  }
+
+  /* Menu Lateral */
+  .sidebar {
+    background: var(--fundo-sidebar);
+    border-right: 1px solid var(--cor-borda);
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+  .cabecalho-sidebar {
+    text-align: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--cor-borda);
+    margin-bottom: 24px;
+  }
+  
+  nav.navegacao { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .navegacao button {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--raio-borda);
+    font-size: 14px;
+    color: var(--texto-suave);
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .navegacao button:hover { background: rgba(255,255,255,0.03); color: #FFF; }
+  .navegacao button.ativo {
+    background: var(--brilho-ouro);
+    color: var(--amarelo-ouro);
+    border: 1px solid var(--amarelo-ouro);
+    font-weight: 600;
+  }
+  .navegacao button .icone { width: 18px; text-align: center; }
+
+  .rodape-sidebar {
+    padding-top: 16px;
+    border-top: 1px solid var(--cor-borda);
+    font-size: 12px;
+    color: var(--texto-suave);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .botao-sair {
+    background: transparent;
+    border: none;
+    color: var(--cor-erro);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  /* Conteúdo Principal */
+  main { padding: 32px 40px 64px; max-width: 1200px; margin: 0 auto; width: 100%; }
+  @media (max-width: 600px) { main { padding: 20px 16px 48px; } }
+
+  .barra-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+  .barra-topo h1 { font-size: 26px; font-weight: 700; color: #FFF; }
+  .barra-topo .data { font-size: 12px; color: var(--texto-suave); margin-top: 4px; }
+  
+  .campo-busca {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-borda);
+    padding: 9px 12px;
+    min-width: 240px;
+  }
+  .campo-busca input { border: none; outline: none; font-size: 14px; width: 100%; background: transparent; color: var(--texto-principal); }
+
+  .pagina { display: none; animation: esvanecer .25s ease; }
+  .pagina.ativa { display: block; }
+  @keyframes esvanecer { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* ==========================================================
+     3. CARDS / INDICADORES (KPIs) E PAINÉIS
+  ========================================================== */
+  .grade-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  @media (max-width: 760px) { .grade-kpi { grid-template-columns: repeat(2, 1fr); } }
+  
+  .kpi {
+    background: var(--fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-borda);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--amarelo-ouro);
+  }
+  .kpi.alerta::before { background: var(--cor-erro); }
+  .kpi.ok::before { background: var(--cor-sucesso); }
+  .kpi .numero { font-family: 'Montserrat'; font-size: 28px; font-weight: 700; color: #FFF; line-height: 1; }
+  .kpi .rotulo { font-size: 12px; color: var(--texto-suave); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .grade-dupla { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .grade-dupla { grid-template-columns: 1fr; } }
+
+  .painel {
+    background: var(--fundo-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-borda);
+    padding: 20px 22px;
+  }
+  .painel h3 { font-size: 15px; margin-bottom: 16px; color: #FFF; display: flex; align-items: center; justify-content: space-between; }
+  .painel h3 small { font-family: 'Work Sans'; font-size: 12px; color: var(--texto-suave); font-weight: 400; }
+
+  /* Tabelas */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th {
+    text-align: left;
+    font-family: 'Montserrat';
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+    color: var(--texto-suave);
+    padding: 10px;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+  td { padding: 12px 10px; border-bottom: 1px solid var(--cor-borda); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+  /* Tags de Status */
+  .tag {
+    display: inline-block;
+    font-family: 'Montserrat';
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .tag.ok { background: rgba(46, 191, 115, 0.15); color: var(--cor-sucesso); border: 1px solid var(--cor-sucesso); }
+  .tag.alerta { background: rgba(229, 77, 66, 0.15); color: var(--cor-erro); border: 1px solid var(--cor-erro); }
+  .tag.pendente { background: rgba(229, 169, 60, 0.15); color: var(--amarelo-ouro); border: 1px solid var(--amarelo-ouro); }
+
+  /* Botões */
+  .btn {
+    all: unset; cursor: pointer;
+    font-family: 'Montserrat'; font-size: 12px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+    padding: 12px 18px;
+    border-radius: var(--raio-borda);
+    background: var(--amarelo-ouro); color: var(--texto-escuro);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+  }
+  .btn:hover { background: var(--ouro-hover); }
+  .btn.contorno { background: transparent; color: var(--texto-principal); border: 1px solid var(--cor-borda); }
+  .btn.contorno:hover { border-color: var(--texto-suave); background: rgba(255,255,255,0.05); }
+  .btn.perigo { background: var(--cor-erro); color: #FFF; }
+  .btn.pequeno { padding: 6px 12px; font-size: 11px; width: auto; }
+
+  .barra-ferramentas { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+
+  /* Formulários */
+  .grade-formulario { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .grade-formulario { grid-template-columns: 1fr; } }
+  
+  label { font-size: 11px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 6px; font-weight: 600; text-align: left; }
+  input[type=text], input[type=password], input[type=number], input[type=date], select, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--cor-borda); border-radius: var(--raio-borda);
+    font-family: 'Work Sans'; font-size: 14px; background: var(--fundo-principal); color: var(--texto-principal);
+  }
+  input:focus, select:focus { outline: 1px solid var(--amarelo-ouro); border-color: var(--amarelo-ouro); }
+  .campo { margin-bottom: 16px; text-align: left; width: 100%; }
+  .acoes-formulario { display: flex; gap: 10px; margin-top: 12px; }
+
+  .formulario-dividido { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 820px) { .formulario-dividido { grid-template-columns: 1fr; } }
+
+  .dica { font-size: 12px; color: var(--texto-suave); margin-top: 16px; line-height: 1.5; }
+  .dica b { color: var(--texto-principal); }
+
+  /* Cards de Pedidos */
+  .card-pedido {
+    background: var(--fundo-card); border: 1px solid var(--cor-borda); border-radius: var(--raio-borda);
+    padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .card-pedido .info b { font-size: 15px; color: #FFF; }
+  .card-pedido .meta { font-size: 12.5px; color: var(--texto-suave); margin-top: 4px; }
+  .card-pedido .direita { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+  /* Notificação Toast */
+  .toast {
+    position: fixed; bottom: 22px; right: 22px; background: var(--fundo-card); color: var(--texto-principal);
+    padding: 14px 20px; border-radius: var(--raio-borda); font-size: 13.5px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: none; z-index: 105; border-left: 4px solid var(--amarelo-ouro); border: 1px solid var(--cor-borda);
+  }
+  .toast.mostrar { display: block; animation: esvanecer .2s ease; }
+
+  .vazio { text-align: center; padding: 32px 10px; color: var(--texto-suave); font-size: 13.5px; }
+
+  /* Modal Flutuante */
+  .fundo-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .fundo-modal.mostrar { display: flex; }
+  .modal { width: min(600px, 100%); max-height: 90vh; overflow: auto; background: var(--fundo-card); border: 1px solid var(--cor-borda); border-radius: 12px; padding: 28px; }
+  .cabecalho-modal { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .botao-fechar { all: unset; cursor: pointer; font-size: 20px; color: var(--texto-suave); }
+  .botao-fechar:hover { color: #FFF; }
+  
+  .caixa-total { display: flex; justify-content: flex-end; font-family: Montserrat; font-size: 18px; font-weight: 700; margin-top: 14px; color: var(--amarelo-ouro); }
+</style>
+</head>
+<body>
+
+<!-- ================= TELA DE LOGIN ================= -->
+<div id="tela-login">
+  <div class="card-login">
+    <div class="icone-logo">
+      <div class="garrafa g-esquerda"></div>
+      <div class="garrafa g-centro"></div>
+      <div class="garrafa g-direita"></div>
+    </div>
+    <div class="titulo-marca">DRINK <span>HUB</span></div>
+    <div class="slogan-marca">Seu negócio, sob controle!</div>
+
+    <form id="form-login">
+      <div class="campo">
+        <label>Usuário</label>
+        <input type="text" id="login-usuario" placeholder="admin" required>
+      </div>
+      <div class="campo">
+        <label>Senha</label>
+        <input type="password" id="login-senha" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn" style="margin-top: 8px;">Entrar no Sistema</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= APLICAÇÃO PRINCIPAL ================= -->
+<div class="app">
+
+  <!-- MENU LATERAL (SIDEBAR) -->
+  <aside class="sidebar">
+    <div class="cabecalho-sidebar">
+      <div class="icone-logo">
+        <div class="garrafa g-esquerda"></div>
+        <div class="garrafa g-centro"></div>
+        <div class="garrafa g-direita"></div>
+      </div>
+      <div class="titulo-marca" style="font-size: 18px;">DRINK <span>HUB</span></div>
+      <div class="slogan-marca" style="margin-bottom:0;">Seu negócio, sob controle!</div>
+    </div>
+
+    <!-- Navegação de Abas -->
+    <nav class="navegacao" id="navegacao">
+      <button data-pagina="dashboard" class="ativo"><span class="icone">◆</span> Dashboard</button>
+      <button data-pagina="produtos"><span class="icone">▤</span> Produtos</button>
+      <button data-pagina="estoque"><span class="icone">⇄</span> Entrada / Saída</button>
+      <button data-pagina="pedidos"><span class="icone">▣</span> Pedidos</button>
+      <button data-pagina="retirada"><span class="icone">⎋</span> Retire Aqui</button>
+      <button data-pagina="historico"><span class="icone">≡</span> Histórico</button>
+    </nav>
+
+    <div class="rodape-sidebar">
+      <span>Operador: <b style="color:#FFF" id="exibir-usuario">Admin</b></span>
+      <button class="botao-sair" id="btn-sair">Sair</button>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+  <main>
+
+    <!-- ABA: DASHBOARD -->
+    <section class="pagina ativa" id="pagina-dashboard">
+      <div class="barra-topo">
+        <div>
+          <h1>Dashboard</h1>
+          <div class="data" id="data-hoje"></div>
+        </div>
+      </div>
+
+      <!-- Indicadores Rápidos -->
+      <div class="grade-kpi">
+        <div class="kpi"><div class="numero" id="kpi-produtos">0</div><div class="rotulo">Produtos Cadastrados</div></div>
+        <div class="kpi alerta"><div class="numero" id="kpi-baixo">0</div><div class="rotulo">Estoque Baixo</div></div>
+        <div class="kpi ok"><div class="numero" id="kpi-pedidos">0</div><div class="rotulo">Pedidos em Aberto</div></div>
+        <div class="kpi"><div class="numero" id="kpi-valor">R$ 0</div><div class="rotulo">Valor em Estoque</div></div>
+      </div>
+
+      <div class="grade-dupla">
+        <div class="painel">
+          <h3>Últimas Movimentações <small>entradas e saídas recentes</small></h3>
+          <table>
+            <thead><tr><th>Produto</th><th>Tipo</th><th>Qtd.</th><th>Data</th></tr></thead>
+            <tbody id="tabela-mov-recentes"></tbody>
+          </table>
+        </div>
+        <div class="painel">
+          <h3>Alertas de Estoque <small>abaixo do mínimo</small></h3>
+          <div id="lista-alertas"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA: PRODUTOS -->
+    <section class="pagina" id="pagina-produtos">
+      <div class="barra-topo">
+        <div><h1>Produtos</h1><div class="data">Gerenciamento de catálogo e saldos</div></div>
+      </div>
+
+      <div class="barra-ferramentas">
+        <div class="campo-busca"><span>🔎</span><input type="text" id="busca-produto" placeholder="Buscar produto ou categoria..."></div>
+        <button class="btn pequeno" id="btn-novo-produto">+ Novo Produto</button>
+      </div>
+
+      <div class="painel">
+        <table>
+          <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Mínimo</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="tabela-produtos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABA: ENTRADA / SAÍDA DE ESTOQUE -->
+    <section class="pagina" id="pagina-estoque">
+      <div class="barra-topo">
+        <div><h1>Entrada / Saída</h1><div class="data">Movimentação manual de mercadorias</div></div>
+      </div>
+
+      <div class="formulario-dividido">
+        <!-- Registrar Entrada -->
+        <div class="painel">
+          <h3 style="color:var(--cor-sucesso)">Registrar Entrada</h3>
+          <div class="campo"><label>Produto</label><select id="entrada-produto"></select></div>
+          <div class="campo"><label>Quantidade</label><input type="number" id="entrada-qtd" placeholder="0"></div>
+          <div class="campo"><label>Fornecedor / Origem</label><input type="text" placeholder="Ex: Cervejaria Ambev"></div>
+          <button class="btn" style="background:var(--cor-sucesso); color:#fff;" id="btn-entrada">Confirmar Entrada</button>
+        </div>
+
+        <!-- Registrar Saída -->
+        <div class="painel">
+          <h3 style="color:var(--cor-erro)">Registrar Saída</h3>
+          <div class="campo"><label>Produto</label><select id="saida-produto"></select></div>
+          <div class="campo"><label>Quantidade</label><input type="number" id="saida-qtd" placeholder="0"></div>
+          <div class="campo"><label>Motivo</label>
+            <select><option>Venda / Balcão</option><option>Perda / Avaria</option><option>Ajuste de Inventário</option></select>
+          </div>
+          <button class="btn" style="background:var(--cor-erro); color:#fff;" id="btn-saida">Confirmar Saída</button>
+        </div>
+      </div>
+      <p class="dica"><b>Informação:</b> As movimentações feitas aqui atualizam imediatamente o estoque e alimentam a aba Histórico.</p>
+    </section>
+
+    <!-- ABA: PEDIDOS -->
+    <section class="pagina" id="pagina-pedidos">
+      <div class="barra-topo">
+        <div><h1>Pedidos</h1><div class="data">Acompanhamento e alteração de status</div></div>
+        <button class="btn pequeno" id="btn-novo-pedido">+ Novo Pedido</button>
+      </div>
+      <div id="lista-pedidos"></div>
+    </section>
+
+    <!-- ABA: RETIRE AQUI -->
+    <section class="pagina" id="pagina-retirada">
+      <div class="barra-topo">
+        <div><h1>Retire Aqui</h1><div class="data">Validar retirada de pedidos na loja</div></div>
+      </div>
+      <div class="painel" style="max-width:480px;">
+        <h3>Buscar Pedido</h3>
+        <div class="campo"><label>Código do Pedido</label><input type="text" id="cod-retirada" placeholder="Ex: 1024"></div>
+        <button class="btn" id="btn-buscar-retirada">Buscar Pedido</button>
+        <div id="resultado-retirada" style="margin-top:20px;"></div>
+      </div>
+    </section>
+
+    <!-- ABA: HISTÓRICO DE MOVIMENTAÇÕES -->
+    <section class="pagina" id="pagina-historico">
+      <div class="barra-topo">
+        <div><h1>Histórico</h1><div class="data">Registro completo de auditoria do estoque</div></div>
+        <select id="filtro-historico" style="width: auto;">
+          <option value="todos">Todas as movimentações</option>
+          <option value="Entrada">Apenas Entradas</option>
+          <option value="Saída">Apenas Saídas</option>
+        </select>
+      </div>
+      <div class="painel">
+        <table>
+          <thead><tr><th>Data/Hora</th><th>Produto</th><th>Tipo</th><th>Qtd.</th><th>Responsável</th></tr></thead>
+          <tbody id="tabela-historico"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL: CADASTRAR / EDITAR PRODUTO -->
+<div class="fundo-modal" id="modal-produto">
+  <div class="modal">
+    <div class="cabecalho-modal"><h3 id="titulo-modal-produto">Novo Produto</h3><button class="botao-fechar" onclick="fecharModal('modal-produto')">✕</button></div>
+    <input type="hidden" id="edit-produto-id">
+    <div class="grade-formulario">
+      <div class="campo"><label>Nome do Produto</label><input id="m-prod-nome" type="text" placeholder="Ex: Heineken Long Neck 330ml"></div>
+      <div class="campo"><label>Categoria</label><select id="m-prod-cat"><option>Cerveja</option><option>Refrigerante</option><option>Água</option><option>Destilados</option><option>Energético</option><option>Vinho</option></select></div>
+      <div class="campo"><label>Preço (R$)</label><input id="m-prod-preco" type="number" step="0.01"></div>
+      <div class="campo"><label>Estoque Inicial</label><input id="m-prod-estoque" type="number"></div>
+      <div class="campo"><label>Estoque Mínimo</label><input id="m-prod-minimo" type="number"></div>
+    </div>
+    <div class="acoes-formulario"><button class="btn" id="btn-salvar-produto">Salvar</button><button class="btn contorno" onclick="fecharModal('modal-produto')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- MODAL: CRIAR NOVO PEDIDO -->
+<div class="fundo-modal" id="modal-pedido">
+  <div class="modal">
+    <div class="cabecalho-modal"><h3>Novo Pedido</h3><button class="botao-fechar" onclick="fecharModal('modal-pedido')">✕</button></div>
+    <div class="campo"><label>Cliente</label><input id="pedido-cliente" type="text" placeholder="Nome do cliente/estabelecimento"></div>
+    <div id="pedido-itens"></div>
+    <button class="btn contorno pequeno" id="btn-add-item" style="margin-top: 8px;">+ Adicionar Item</button>
+    <div class="caixa-total">Total: R$ <span id="pedido-total">0,00</span></div>
+    <div class="acoes-formulario"><button class="btn" id="btn-salvar-pedido">Criar Pedido</button><button class="btn contorno" onclick="fecharModal('modal-pedido')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- ELEMENTO DE NOTIFICAÇÃO TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========================================================
+   BANCO DE DADOS EM MEMÓRIA
+========================================================== */
+let produtos = [
+  { id:1, nome:"Cerveja Pilsen 350ml", categoria:"Cerveja", preco:3.20, estoque:420, minimo:100 },
+  { id:2, nome:"Refrigerante Cola 2L", categoria:"Refrigerante", preco:7.50, estoque:85, minimo:100 },
+  { id:3, nome:"Água Mineral 500ml", categoria:"Água", preco:1.80, estoque:600, minimo:150 },
+  { id:4, nome:"Energético 250ml", categoria:"Energético", preco:6.90, estoque:40, minimo:80 },
+  { id:5, nome:"Whisky 1L Premium", categoria:"Destilados", preco:119.90, estoque:15, minimo:10 }
+];
+
+let historico = [
+  { data:"03/09 14:10", produto:"Cerveja Pilsen 350ml", tipo:"Entrada", qtd:200, resp:"Admin" },
+  { data:"03/09 11:05", produto:"Refrigerante Cola 2L", tipo:"Saída", qtd:15, resp:"Sistema (pedido)" }
+];
+
+let pedidos = [
+  { id:1024, cliente:"Bar do Zé", itens:3, valor:342.00, status:"Aguardando retirada" },
+  { id:1023, cliente:"Mercadinho Silva", itens:5, valor:890.00, status:"Confirmado" }
+];
+
+/* ==========================================================
+   CONTROLE DE LOGIN E SESSÃO
+========================================================== */
+const telaLogin = document.getElementById('tela-login');
+
+document.getElementById('form-login').addEventListener('submit', (evento) => {
+  evento.preventDefault();
+  const usuario = document.getElementById('login-usuario').value;
+  document.getElementById('exibir-usuario').textContent = usuario || 'Admin';
+  telaLogin.classList.add('escondido');
+  exibirToast('Login efetuado com sucesso!');
+});
+
+document.getElementById('btn-sair').addEventListener('click', () => {
+  telaLogin.classList.remove('escondido');
+});
+
+/* ==========================================================
+   NAVEGAÇÃO ENTRE ABAS
+========================================================== */
+const botoesNavegacao = document.querySelectorAll('.navegacao button');
+botoesNavegacao.forEach(botao => {
+  botao.addEventListener('click', () => {
+    botoesNavegacao.forEach(b => b.classList.remove('ativo'));
+    botao.classList.add('ativo');
+    
+    document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+    document.getElementById('pagina-' + botao.dataset.pagina).classList.add('ativa');
+  });
+});
+
+function exibirToast(mensagem) {
+  const t = document.getElementById('toast');
+  t.textContent = mensagem;
+  t.classList.add('mostrar');
+  clearTimeout(window._timerToast);
+  window._timerToast = setTimeout(() => t.classList.remove('mostrar'), 2600);
+}
+
+/* ==========================================================
+   ATUALIZAÇÃO DO DASHBOARD
+========================================================== */
+function renderizarDashboard() {
+  document.getElementById('kpi-produtos').textContent = produtos.length;
+  const baixoEstoque = produtos.filter(p => p.estoque < p.minimo);
+  document.getElementById('kpi-baixo').textContent = baixoEstoque.length;
+  document.getElementById('kpi-pedidos').textContent = pedidos.filter(p => p.status !== "Retirado").length;
+  
+  const valorTotal = produtos.reduce((soma, p) => soma + (p.preco * p.estoque), 0);
+  document.getElementById('kpi-valor').textContent = "R$ " + valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+  document.getElementById('tabela-mov-recentes').innerHTML = historico.slice(0, 5).map(h => `
+    <tr><td>${h.produto}</td><td><span class="tag ${h.tipo === 'Entrada' ? 'ok' : 'alerta'}">${h.tipo}</span></td><td>${h.qtd}</td><td class="mono">${h.data}</td></tr>
+  `).join('');
+
+  const listaAlertas = document.getElementById('lista-alertas');
+  if (baixoEstoque.length === 0) {
+    listaAlertas.innerHTML = `<div class="vazio">Estoque regularizado.</div>`;
+  } else {
+    listaAlertas.innerHTML = baixoEstoque.map(p => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--cor-borda);">
+        <div>
+          <div style="font-weight:600; font-size:13px; color:#FFF;">${p.nome}</div>
+          <div style="font-size:11px; color:var(--texto-suave);">${p.estoque} un. restantes (mín: ${p.minimo})</div>
+        </div>
+        <span class="tag alerta">Crítico</span>
+      </div>
+    `).join('');
+  }
+}
+
+/* ==========================================================
+   GERENCIAMENTO DE PRODUTOS
+========================================================== */
+function renderizarProdutos(filtro = "") {
+  const tabela = document.getElementById('tabela-produtos');
+  const termo = filtro.toLowerCase();
+  const lista = produtos.filter(p => p.nome.toLowerCase().includes(termo) || p.categoria.toLowerCase().includes(termo));
+  
+  if (!lista.length) {
+    tabela.innerHTML = '<tr><td colspan="7"><div class="vazio">Nenhum produto encontrado.</div></td></tr>';
+    return;
+  }
+  
+  tabela.innerHTML = lista.map(p => {
+    const baixo = p.estoque < p.minimo;
+    return `<tr>
+      <td><b style="color:#FFF">${p.nome}</b></td>
+      <td>${p.categoria}</td>
+      <td class="mono">R$ ${p.preco.toFixed(2)}</td>
+      <td class="mono">${p.estoque}</td>
+      <td class="mono">${p.minimo}</td>
+      <td>${baixo ? '<span class="tag alerta">Baixo</span>' : '<span class="tag ok">Normal</span>'}</td>
+      <td>
+        <button class="btn contorno pequeno" onclick="editarProduto(${p.id})">Editar</button>
+        <button class="btn perigo pequeno" onclick="excluirProduto(${p.id})">Excluir</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('busca-produto').addEventListener('input', e => renderizarProdutos(e.target.value));
+
+function abrirModalProduto(id = null) {
+  document.getElementById('edit-produto-id').value = id || '';
+  document.getElementById('titulo-modal-produto').textContent = id ? 'Editar Produto' : 'Novo Produto';
+  
+  if (id) {
+    const p = produtos.find(x => x.id === id);
+    document.getElementById('m-prod-nome').value = p.nome;
+    document.getElementById('m-prod-cat').value = p.categoria;
+    document.getElementById('m-prod-preco').value = p.preco;
+    document.getElementById('m-prod-estoque').value = p.estoque;
+    document.getElementById('m-prod-minimo').value = p.minimo;
+  } else {
+    ['m-prod-nome','m-prod-preco','m-prod-estoque','m-prod-minimo'].forEach(x => document.getElementById(x).value = '');
+  }
+  document.getElementById('modal-produto').classList.add('mostrar');
+}
+
+function editarProduto(id) { abrirModalProduto(id); }
+
+function excluirProduto(id) {
+  if (confirm("Deseja realmente remover este produto?")) {
+    produtos = produtos.filter(x => x.id !== id);
+    atualizarTodasAsTelas();
+    exibirToast('Produto removido!');
+  }
+}
+
+document.getElementById('btn-novo-produto').addEventListener('click', () => abrirModalProduto());
+
+document.getElementById('btn-salvar-produto').addEventListener('click', () => {
+  const id = Number(document.getElementById('edit-produto-id').value) || null;
+  const nome = document.getElementById('m-prod-nome').value.trim();
+  const categoria = document.getElementById('m-prod-cat').value;
+  const preco = Number(document.getElementById('m-prod-preco').value);
+  const estoque = Number(document.getElementById('m-prod-estoque').value);
+  const minimo = Number(document.getElementById('m-prod-minimo').value);
+
+  if (!nome || isNaN(preco)) { exibirToast('Preencha os campos corretamente.'); return; }
+
+  if (id) {
+    Object.assign(produtos.find(x => x.id === id), { nome, categoria, preco, estoque, minimo });
+  } else {
+    produtos.push({ id: Date.now(), nome, categoria, preco, estoque, minimo });
+  }
+  
+  fecharModal('modal-produto');
+  atualizarTodasAsTelas();
+  exibirToast('Produto salvo com sucesso!');
+});
+
+/* ==========================================================
+   MOVIMENTAÇÃO DE ESTOQUE
+========================================================== */
+function preencherOpcoesProdutos() {
+  const opcoes = produtos.map(p => `<option value="${p.id}">${p.nome} (Atual: ${p.estoque})</option>`).join('');
+  document.getElementById('entrada-produto').innerHTML = opcoes;
+  document.getElementById('saida-produto').innerHTML = opcoes;
+}
+
+function registrarMovimento(tipo, idProduto, quantidade) {
+  const p = produtos.find(x => x.id == idProduto);
+  quantidade = Number(quantidade);
+
+  if (!p || !quantidade || quantidade <= 0) { exibirToast('Quantidade inválida.'); return; }
+  if (tipo === 'Saída' && quantidade > p.estoque) { exibirToast('Estoque insuficiente!'); return; }
+
+  p.estoque += (tipo === 'Entrada' ? quantidade : -quantidade);
+  
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}) + " " + agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  historico.unshift({ data: dataFormatada, produto: p.nome, tipo, qtd: quantidade, resp: "Admin" });
+
+  atualizarTodasAsTelas();
+  exibirToast(`Movimentação salva: ${tipo} (${quantidade}x)`);
+}
+
+document.getElementById('btn-entrada').addEventListener('click', () => {
+  registrarMovimento('Entrada', document.getElementById('entrada-produto').value, document.getElementById('entrada-qtd').value);
+  document.getElementById('entrada-qtd').value = '';
+});
+
+document.getElementById('btn-saida').addEventListener('click', () => {
+  registrarMovimento('Saída', document.getElementById('saida-produto').value, document.getElementById('saida-qtd').value);
+  document.getElementById('saida-qtd').value = '';
+});
+
+/* ==========================================================
+   GERENCIAMENTO DE PEDIDOS
+========================================================== */
+function renderizarPedidos() {
+  const container = document.getElementById('lista-pedidos');
+  if (!pedidos.length) { container.innerHTML = '<div class="painel vazio">Nenhum pedido cadastrado.</div>'; return; }
+  
+  container.innerHTML = pedidos.map(p => `
+    <div class="card-pedido">
+      <div class="info">
+        <b>Pedido #${p.id} — ${p.cliente}</b>
+        <div class="meta">${p.itens} itens · Total: R$ ${p.valor.toFixed(2)}</div>
+      </div>
+      <div class="direita">
+        <span class="tag ${p.status === 'Retirado' ? 'ok' : 'pendente'}">${p.status}</span>
+        ${p.status !== 'Retirado' ? `<button class="btn pequeno contorno" onclick="avancarStatusPedido(${p.id})">Avançar Status</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function avancarStatusPedido(id) {
+  const p = pedidos.find(x => x.id === id);
+  if (p.status === "Confirmado") p.status = "Aguardando retirada";
+  else if (p.status === "Aguardando retirada") p.status = "Retirado";
+  
+  renderizarPedidos();
+  renderizarDashboard();
+}
+
+/* ==========================================================
+   SISTEMA DE NOVO PEDIDO (ABRIR, ADICIONAR ITENS E SALVAR)
+========================================================== */
+const modalPedido = document.getElementById('modal-pedido');
+const btnNovoPedido = document.getElementById('btn-novo-pedido');
+const containerItens = document.getElementById('pedido-itens');
+
+// 1. Abrir Modal de Novo Pedido
+btnNovoPedido.addEventListener('click', () => {
+  document.getElementById('pedido-cliente').value = '';
+  containerItens.innerHTML = '';
+  adicionarLinhaItem(); // Adiciona o primeiro item automaticamente
+  modalPedido.classList.add('mostrar');
+});
+
+// 2. Criar Select com os Produtos e Input de Quantidade
+function adicionarLinhaItem() {
+  const div = document.createElement('div');
+  div.className = 'grade-formulario item-pedido-linha';
+  div.style.marginBottom = '10px';
+  
+  const opcoes = produtos.map(p => `<option value="${p.id}" data-preco="${p.preco}">${p.nome} (R$ ${p.preco.toFixed(2)})</option>`).join('');
+  
+  div.innerHTML = `
+    <div class="campo" style="margin:0;">
+      <select class="item-select" onchange="atualizarTotalPedido()">${opcoes}</select>
+    </div>
+    <div class="campo" style="margin:0; display:flex; gap:6px;">
+      <input type="number" class="item-qtd" value="1" min="1" oninput="atualizarTotalPedido()">
+      <button type="button" class="btn perigo pequeno" onclick="this.parentElement.parentElement.remove(); atualizarTotalPedido();">✕</button>
+    </div>
+  `;
+  
+  containerItens.appendChild(div);
+  atualizarTotalPedido();
+}
+
+document.getElementById('btn-add-item').addEventListener('click', adicionarLinhaItem);
+
+// 3. Somar Valor Total em Tempo Real
+function atualizarTotalPedido() {
+  let total = 0;
+  const linhas = containerItens.querySelectorAll('.item-pedido-linha');
+  
+  linhas.forEach(linha => {
+    const select = linha.querySelector('.item-select');
+    const inputQtd = linha.querySelector('.item-qtd');
+    
+    if (select && inputQtd) {
+      const preco = Number(select.options[select.selectedIndex].dataset.preco);
+      const qtd = Number(inputQtd.value) || 0;
+      total += preco * qtd;
+    }
+  });
+  
+  document.getElementById('pedido-total').textContent = total.toFixed(2).replace('.', ',');
+}
+
+// 4. Salvar o Pedido no Sistema
+document.getElementById('btn-salvar-pedido').addEventListener('click', () => {
+  const cliente = document.getElementById('pedido-cliente').value.trim();
+  const linhas = containerItens.querySelectorAll('.item-pedido-linha');
+  
+  if (!cliente) {
+    exibirToast('Informe o nome do cliente!');
+    return;
+  }
+  
+  if (linhas.length === 0) {
+    exibirToast('Adicione pelo menos um item ao pedido!');
+    return;
+  }
+
+  let totalPedido = 0;
+  let totalItens = 0;
+
+  linhas.forEach(linha => {
+    const idProd = Number(linha.querySelector('.item-select').value);
+    const qtd = Number(linha.querySelector('.item-qtd').value) || 0;
+    const prod = produtos.find(p => p.id === idProd);
+    
+    if (prod) {
+      prod.estoque = Math.max(0, prod.estoque - qtd); // Baixa no estoque
+      totalPedido += prod.preco * qtd;
+      totalItens += qtd;
+    }
+  });
+
+  const novoId = Math.floor(1000 + Math.random() * 9000);
+  pedidos.unshift({
+    id: novoId,
+    cliente: cliente,
+    itens: totalItens,
+    valor: totalPedido,
+    status: "Confirmado"
+  });
+
+  fecharModal('modal-pedido');
+  atualizarTodasAsTelas();
+  exibirToast(`Pedido #${novoId} criado com sucesso!`);
+});
+
+/* ==========================================================
+   RETIRADA NO BALCÃO
+========================================================== */
+document.getElementById('btn-buscar-retirada').addEventListener('click', () => {
+  const codigo = document.getElementById('cod-retirada').value;
+  const painelResultado = document.getElementById('resultado-retirada');
+  const pedido = pedidos.find(x => x.id == codigo);
+
+  if (!pedido) {
+    painelResultado.innerHTML = '<div class="dica">Pedido não localizado.</div>';
+  } else {
+    painelResultado.innerHTML = `
+      <div style="background:var(--fundo-principal); padding:16px; border-radius:8px; border:1px solid var(--cor-borda)">
+        <b style="color:#FFF">#${pedido.id} - ${pedido.cliente}</b>
+        <div style="margin: 8px 0; font-size:13px">Status: <span class="tag pendente">${pedido.status}</span></div>
+        <button class="btn pequeno" style="width:100%" onclick="confirmarRetiradaFinal(${pedido.id})">Confirmar Retirada</button>
+      </div>
+    `;
+  }
+});
+
+function confirmarRetiradaFinal(id) {
+  const p = pedidos.find(x => x.id === id);
+  p.status = "Retirado";
+  exibirToast(`Pedido #${id} entregue com sucesso!`);
+  document.getElementById('resultado-retirada').innerHTML = '';
+  atualizarTodasAsTelas();
+}
+
+/* ==========================================================
+   HISTÓRICO E AUDITORIA
+========================================================== */
+function renderizarHistorico() {
+  const filtro = document.getElementById('filtro-historico').value;
+  const lista = filtro === 'todos' ? historico : historico.filter(h => h.tipo === filtro);
+  
+  document.getElementById('tabela-historico').innerHTML = lista.map(h => `
+    <tr>
+      <td class="mono">${h.data}</td>
+      <td style="color:#FFF;">${h.produto}</td>
+      <td><span class="tag ${h.tipo === 'Entrada' ? 'ok' : 'alerta'}">${h.tipo}</span></td>
+      <td class="mono">${h.qtd}</td>
+      <td>${h.resp}</td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('filtro-historico').addEventListener('change', renderizarHistorico);
+
+/* ==========================================================
+   FUNÇÕES AUXILIARES E INICIALIZAÇÃO
+========================================================== */
+function fecharModal(idModal) { 
+  document.getElementById(idModal).classList.remove('mostrar'); 
+}
+
+function atualizarTodasAsTelas() {
+  renderizarDashboard();
+  renderizarProdutos();
+  preencherOpcoesProdutos();
+  renderizarPedidos();
+  renderizarHistorico();
+}
+
+document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { 
+  weekday: 'long', 
+  day: '2-digit', 
+  month: 'long', 
+  year: 'numeric' 
+});
+
+atualizarTodasAsTelas();
+</script>
+</body>
+</html>
+
